@@ -35,23 +35,28 @@ def main(args):
     input_path = args['input_file']
     output_path = args['output_path']
     base, filename = os.path.split(input_path)
+
+    # check if a wildcard has been used to match files
     input_files = []
     if '*' in filename:
-        # write logic for file searching (glob library)
-        raise ValueError('Wildcards not implemented yet!')
+        matches = glob.glob(os.path.join(base, filename))
+        for item in matches:
+            input_files.append(item)
     else:
         input_files.append(os.path.join(base, filename))
 
+    # iterate through input files and create a job for each
     for item in input_files:
+        output_file = os.path.join("outfiles", os.path.split(item)[1] + ".root")
         job = etree.SubElement(root, "Job")
         etree.SubElement(job, "Input",
                          src=item,
                          dest="infile")
         etree.SubElement(job, "Output",
-                         src=os.path.join("outfiles", os.path.split(item)[1] + ".root"),
+                         src=output_file,
                          dest=output_path)
 
-    # write to file
+    # write to std out
     print(etree.tostring(root, pretty_print=True))
 
 
