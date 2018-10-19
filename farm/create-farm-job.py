@@ -13,25 +13,34 @@ def main(args):
     base, filename = os.path.split(input_path)
 
     # check if a wildcard has been used to match files
+    # otherwise just use input file
     input_files = []
     if '*' in filename:
         matches = glob.glob(os.path.join(base, filename))
+        print(base, filename)
         for item in matches:
             input_files.append(item)
     else:
         input_files.append(os.path.join(base, filename))
+    print(input_files)
 
-    data = args
-    extras = {
-        'command': 'root',
-        'options': '-l -b -q --farm --hsdata ConvertHSHipoTriggerChain.C --hsin=./ --hsout=outfiles/',
-        'other_files': '$HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C',
-        'output_data': 'outfiles/*.root',
-        'output_template': args['output_path'],
-        'input_files': '\n'.join(input_files),
-    }
-    data.update(extras)
-    print(src.substitute(data))
+    n = args['grouping']
+    input_files_final = []
+    for i in range(0, len(input_files), n):
+        input_files_final.append(input_files[i:i+n])
+
+    for item in input_files_final:
+        data = args
+        extras = {
+            'command': 'root',
+            'options': '-l -b -q --farm --hsdata ConvertHSHipoTriggerChain.C --hsin=./ --hsout=outfiles/',
+            'other_files': '$HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C',
+            'output_data': 'outfiles/*.root',
+            'output_template': args['output_path'],
+            'input_files': '\n'.join(item),
+        }
+        data.update(extras)
+        print(src.substitute(data))
 
 
 if __name__ == "__main__":
