@@ -1,6 +1,4 @@
 import argparse
-import os
-import glob
 from string import Template
 
 
@@ -16,8 +14,13 @@ def main(args):
     for i in range(0, len(input_files), n):
         input_files_final.append(input_files[i:i+n])
 
+    jsub_filename = "run_{}_submitHSToFarm".format(args['run'])
+
     # iterate the groups
-    for item in input_files_final:
+    output_filesnames = []
+    for i, item in enumerate(input_files_final):
+        # set all the values for each input file
+        output_filename = jsub_filename + "_{}.jsub".format(i)
         data = args
         extras = {
             'command': 'root',
@@ -28,7 +31,20 @@ def main(args):
             'input_files': '\n'.join(item),
         }
         data.update(extras)
-        print(src.substitute(data))
+
+        # write each group of input files to a separate file
+        with open(output_filename, 'w') as f:
+            f.write(src.substitute(data)+'\n')
+
+        # print message for debugging, adding the output file to a list
+        print("Created {}".format(output_filename))
+        output_filesnames.append(output_filename)
+
+    # create a file for running all jsub input files
+    run_filename = 'do_run_{}'.format(args['run'])
+    with open(run_filename, 'w') as f:
+        for line in output_filesnames:
+            f.write("jsub {}".format(line) + '\n')
 
 
 if __name__ == "__main__":
@@ -37,7 +53,7 @@ if __name__ == "__main__":
     parser.add_argument('-p', '--project',
                         help='Project name',
                         required=True)
-    parser.add_argument('-tr', '--track',
+    parser.add_argument('-k', '--track',
                         help='Track name',
                         required=True)
     parser.add_argument('-i', '--input_files',
@@ -45,38 +61,42 @@ if __name__ == "__main__":
                              '(use * wildcard for multiple files',
                         required=True,
                         action='store',
-                        nargs='+')
+                        nargs='+')  # needed for multiple inputs
     parser.add_argument('-o', '--output_path',
                         help='Full path to the output directory',
                         required=True)
-    parser.add_argument('-temp', '--template',
+    parser.add_argument('-t', '--template',
                         help='Template file to use',
                         required=True)
-    parser.add_argument('-m', '--memory',
+    parser.add_argument('-r', '--run',
+                        help='Run number associated with input files '
+                             '(only used for output jsub file names)',
+                        required=True)
+    parser.add_argument('--memory',
                         help='Memory request for job',
                         required=False,
                         default=2000)
-    parser.add_argument('-mu', '--memory_unit',
+    parser.add_argument('--memory_unit',
                         help='Units for the memory request',
                         required=False,
                         default='MB')
-    parser.add_argument('-d', '--diskspace',
+    parser.add_argument('--diskspace',
                         help='Diskspace request for job',
                         required=False,
                         default=30)
-    parser.add_argument('-du', '--diskspace_unit',
+    parser.add_argument('--diskspace_unit',
                         help='Units for the disk space request',
                         required=False,
                         default='GB')
-    parser.add_argument('-os', '--os',
+    parser.add_argument('--os',
                         help='Operating system to use',
                         required=False,
                         default='centos7')
-    parser.add_argument('-t', '--time',
+    parser.add_argument('--time',
                         help='Wall time for job (minutes)',
                         required=False,
                         default=60)
-    parser.add_argument('-g', '--grouping',
+    parser.add_argument('--grouping',
                         help='Number of input files per job',
                         required=False,
                         default=2)
