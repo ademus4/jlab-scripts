@@ -1,0 +1,15 @@
+PROJECT: clas12
+MEMORY: 2000 MB
+TIME: 33
+DISK_SPACE: 30 GB
+SINGLE_JOB:
+COMMAND: root
+OPTIONS: -l -b -q  --farm --hsdata ConvertHSHipoTriggerChain.C --hsin=./ --hsout=outfiles/
+OS: centos7
+TRACK: analysis
+OTHER_FILES: $HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C
+OUTPUT_DATA: outfiles/*.root
+OUTPUT_TEMPLATE: /volatile/clas12/adamt/test/Run004307
+INPUT_FILES:
+/work/clas12/clas12/data/calib/dst_5bp6p1/out_clas_004307.evio.75.hipo
+/work/clas12/clas12/data/calib/dst_5bp6p1/out_clas_004307.evio.316.hipo

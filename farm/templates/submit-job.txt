@@ -1,0 +1,14 @@
+PROJECT: $project
+MEMORY: $memory $memory_unit
+TIME: $time
+DISK_SPACE: $diskspace $diskspace_unit
+SINGLE_JOB:
+COMMAND: $command
+OPTIONS: $options
+OS: $os
+TRACK: $track
+OTHER_FILES: $other_files
+OUTPUT_DATA: $output_data
+OUTPUT_TEMPLATE: $output_template
+INPUT_FILES:
+$input_files

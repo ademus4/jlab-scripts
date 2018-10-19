@@ -1,39 +1,15 @@
 import argparse
 import os
 import glob
-from pprint import pprint
-from lxml import etree
+from string import Template
 
 
 def main(args):
     # set all the values from input
-    root = etree.Element("Request")
-    etree.SubElement(root, "Project",
-                     name=args['project'])
-    etree.SubElement(root, "Track",
-                     name=args['track'])
-    etree.SubElement(root, "Memory",
-                     space=str(args['memory']), unit=args['memory_unit'])
-    etree.SubElement(root, "Diskspace",
-                     space=str(args['diskspace']), unit=args['diskspace_unit'])
-    etree.SubElement(root, "OS",
-                     name=args['os'])
-    etree.SubElement(root, "TimeLimit",
-                     time=str(args['time']), units="minutes")
+    with open(args['template'], 'r') as f:
+        src = Template(f.read())
 
-    command = etree.SubElement(root,"Command")
-    command.text = etree.CDATA("root -l -b -q "
-                               "--farm "
-                               "--hsdata ConvertHSHipoTriggerChain.C "
-                               "--hsin=./ "
-                               "--hsout=outfiles/")
-    etree.SubElement(root, "Input",
-                     src="$HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C",
-                     dest="ConvertHSHipoTriggerChain.C")
-
-    # set the job input and output
     input_path = args['input_file']
-    output_path = args['output_path']
     base, filename = os.path.split(input_path)
 
     # check if a wildcard has been used to match files
@@ -45,19 +21,17 @@ def main(args):
     else:
         input_files.append(os.path.join(base, filename))
 
-    # iterate through input files and create a job for each
-    for item in input_files:
-        output_file = os.path.join("outfiles", os.path.split(item)[1] + ".root")
-        job = etree.SubElement(root, "Job")
-        etree.SubElement(job, "Input",
-                         src=item,
-                         dest="infile")
-        etree.SubElement(job, "Output",
-                         src=output_file,
-                         dest=output_path)
-
-    # write to std out
-    print(etree.tostring(root, pretty_print=True))
+    data = args
+    extras = {
+        'command': 'root',
+        'options': '-l -b -q --farm --hsdata ConvertHSHipoTriggerChain.C --hsin=./ --hsout=outfiles/',
+        'other_files': '$HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C',
+        'output_data': 'outfiles/*.root',
+        'output_template': args['output_path'],
+        'input_files': '\n'.join(input_files),
+    }
+    data.update(extras)
+    print(src.substitute(data))
 
 
 if __name__ == "__main__":
@@ -98,9 +72,16 @@ if __name__ == "__main__":
                         help='Full path to the input file \
                              (use * wildcard for multiple files',
                         required=True)
+    #parser.add_argument('pattern', type=file, action='store', nargs='+')
     parser.add_argument('-o', '--output_path',
                         help='Full path to the output directory',
                         required=True)
-
+    parser.add_argument('-temp', '--template',
+                        help='Template file to use',
+                        required=True)
+    parser.add_argument('-g', '--grouping',
+                        help='Number of input files per job',
+                        required=False,
+                        default=2)
     args = vars(parser.parse_args())
     main(args)
