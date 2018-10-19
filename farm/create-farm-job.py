@@ -9,26 +9,14 @@ def main(args):
     with open(args['template'], 'r') as f:
         src = Template(f.read())
 
-    input_path = args['input_file']
-    base, filename = os.path.split(input_path)
-
-    # check if a wildcard has been used to match files
-    # otherwise just use input file
-    input_files = []
-    if '*' in filename:
-        matches = glob.glob(os.path.join(base, filename))
-        print(base, filename)
-        for item in matches:
-            input_files.append(item)
-    else:
-        input_files.append(os.path.join(base, filename))
-    print(input_files)
-
-    n = args['grouping']
+    # sort the input files into groups
+    n = int(args['grouping'])
+    input_files = args['input_files']  # can be list
     input_files_final = []
     for i in range(0, len(input_files), n):
         input_files_final.append(input_files[i:i+n])
 
+    # iterate the groups
     for item in input_files_final:
         data = args
         extras = {
@@ -46,12 +34,23 @@ def main(args):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description='A program to create jsub files for ifarm jobs')
-
     parser.add_argument('-p', '--project',
                         help='Project name',
                         required=True)
     parser.add_argument('-tr', '--track',
                         help='Track name',
+                        required=True)
+    parser.add_argument('-i', '--input_files',
+                        help='Full path to the input file(s)'
+                             '(use * wildcard for multiple files',
+                        required=True,
+                        action='store',
+                        nargs='+')
+    parser.add_argument('-o', '--output_path',
+                        help='Full path to the output directory',
+                        required=True)
+    parser.add_argument('-temp', '--template',
+                        help='Template file to use',
                         required=True)
     parser.add_argument('-m', '--memory',
                         help='Memory request for job',
@@ -77,17 +76,6 @@ if __name__ == "__main__":
                         help='Wall time for job (minutes)',
                         required=False,
                         default=60)
-    parser.add_argument('-i', '--input_file',
-                        help='Full path to the input file \
-                             (use * wildcard for multiple files',
-                        required=True)
-    #parser.add_argument('pattern', type=file, action='store', nargs='+')
-    parser.add_argument('-o', '--output_path',
-                        help='Full path to the output directory',
-                        required=True)
-    parser.add_argument('-temp', '--template',
-                        help='Template file to use',
-                        required=True)
     parser.add_argument('-g', '--grouping',
                         help='Number of input files per job',
                         required=False,
