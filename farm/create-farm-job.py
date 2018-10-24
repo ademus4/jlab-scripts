@@ -22,10 +22,22 @@ def main(args):
         # set all the values for each input file
         output_filename = jsub_filename + "_{}.jsub".format(i)
         data = args
+
+        # check if DSTs are being used
+        if args['dst']:
+            command_file = 'ConvertHipoDSTChain.C'
+        else:
+            command_file = 'ConvertHSHipoTriggerChain.C'
+
+        # build command options
+        options = '-l -b -q --farm --hsdata {} ' \
+                  '--hsin=./ --hsout=outfiles/'.format(command_file)
+        other_files = '$HSANA/../Projects/hiporeader/{}'.format(command_file)
+
         extras = {
             'command': 'root',
-            'options': '-l -b -q --farm --hsdata ConvertHSHipoTriggerChain.C --hsin=./ --hsout=outfiles/',
-            'other_files': '$HSANA/../Projects/hiporeader/ConvertHSHipoTriggerChain.C',
+            'options': options,
+            'other_files': other_files,
             'output_data': 'outfiles/*.root',
             'output_template': args['output_path'],
             'input_files': '\n'.join(item),
@@ -100,5 +112,9 @@ if __name__ == "__main__":
                         help='Number of input files per job',
                         required=False,
                         default=2)
+    parser.add_argument('--dst',
+                        help='Add if processing DSTs instead of raw data',
+                        required=False,
+                        action='store_true')
     args = vars(parser.parse_args())
     main(args)
