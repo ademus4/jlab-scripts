@@ -32,7 +32,7 @@ def main(args):
         # build command options
         options = '-l -b -q --farm --hsdata {} ' \
                   '--hsin=./ --hsout=outfiles/'.format(command_file)
-        other_files = '$HSANA/../Projects/hiporeader/{}'.format(command_file)
+        other_files = '$HSANA/../Projects/hshiporeader/{}'.format(command_file)
 
         extras = {
             'command': 'root',
