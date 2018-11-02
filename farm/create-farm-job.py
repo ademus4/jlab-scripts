@@ -26,7 +26,7 @@ def main(args):
         command_file = 'ConvertHSHipoTriggerChain.C'
         
         # build command options
-        options = '-l -b -q --farm --hsexp {}' \
+        options = '-l -b -q --farm --hsexp {} ' \
                   '--hsin=./ --hsout=outfiles/'.format(command_file)
         other_files = '$HSEXP/scripts/{}'.format(command_file)
 
