@@ -3,7 +3,7 @@ from string import Template
 
 
 def main(args):
-    # set all the values from input
+    # load template file
     with open(args['template'], 'r') as f:
         src = Template(f.read())
 
@@ -23,16 +23,12 @@ def main(args):
         output_filename = jsub_filename + "_{}.jsub".format(i)
         data = args
 
-        # check if DSTs are being used
-        if args['dst']:
-            command_file = 'ConvertHipoDSTChain.C'
-        else:
-            command_file = 'ConvertHSHipoTriggerChain.C'
-
+        command_file = 'ConvertHSHipoTriggerChain.C'
+        
         # build command options
-        options = '-l -b -q --farm --hsdata {} ' \
+        options = '-l -b -q --farm --hsexp {}' \
                   '--hsin=./ --hsout=outfiles/'.format(command_file)
-        other_files = '$HSANA/../Projects/hshiporeader/{}'.format(command_file)
+        other_files = '$HSEXP/scripts/{}'.format(command_file)
 
         extras = {
             'command': 'root',
