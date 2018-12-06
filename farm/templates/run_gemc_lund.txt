@@ -1,9 +1,8 @@
 #!/usr/bin/env bash
 
 # create the base directories on scratch
-mkdir /scratch/$user/$jobid
-mkdir /scratch/$user/$jobid/input/
-mkdir /scratch/$user/$jobid/output/
+mkdir -p /scratch/$user/$jobid/input/
+mkdir -p /scratch/$user/$jobid/output/
 
 # copy over the input file
 cp $input_path/$input_file /scratch/$user/$jobid/input/
@@ -11,12 +10,12 @@ cp $input_path/$input_file /scratch/$user/$jobid/input/
 # run main simulation
 docker run -it --rm \
     -v /scratch/:/scratch/ \
-    -w /scratch/$user/$jobid/ \
+    -w /scratch/$user/$jobid/output/ \
     maureeungaro/clas12simulations:iprod \
     bash -c "source /etc/profile.d/environment.sh; \
-       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ./input/$input_file' -OUTPUT='evio, ./output/out.ev' -gcard=$gcard; \
-       evio2hipo -r $runid -t $torus -s $solenoid -i ./output/out.ev -o ./output/out.hipo; \
-       createClaraCook.csh ./output/out.hipo $threads; \
+       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, out.ev' -gcard=$gcard; \
+       evio2hipo -r $runid -t $torus -s $solenoid -i out.ev -o out.hipo; \
+       createClaraCook.csh out.hipo $threads; \
        clara-shell cook.clara;"
 
 # copy file over to output dir

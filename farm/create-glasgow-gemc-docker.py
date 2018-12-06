@@ -24,7 +24,7 @@ def main(args):
 
     # prepare the input files
     input_files = args['input_files']  # can be a list
-    jsub_filename = "gemc_docker_{:05d}.jsub"
+    jsub_filename = "gemc_docker_{:05d}"
     user = getpass.getuser()
 
     for i, item in enumerate(input_files):
