@@ -1,11 +1,16 @@
 #!/usr/bin/env bash
 
+#PBS -N gemc_lund_docker
+#PBS -m abe
+#PBS -M $email
+#PBS -V
+
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/input/
 mkdir -p /scratch/$user/$jobid/output/
 
 # copy over the input file
-cp $input_path/$input_file /scratch/$user/$jobid/input/
+cp $input_path/$input_file /scratch/$user/input/
 
 # run main simulation
 docker run -it --rm \
@@ -13,13 +18,13 @@ docker run -it --rm \
     -w /scratch/$user/$jobid/output/ \
     maureeungaro/clas12simulations:iprod \
     bash -c "source /etc/profile.d/environment.sh; \
-       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, out.ev' -gcard=$gcard; \
-       evio2hipo -r $runid -t $torus -s $solenoid -i out.ev -o out.hipo; \
-       createClaraCook.csh out.hipo $threads; \
+       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, gemc.ev' -gcard=$gcard; \
+       evio2hipo -r $runid -t $torus -s $solenoid -i gemc.ev -o gemc.hipo; \
+       createClaraCook.csh gemc.hipo $threads; \
        clara-shell cook.clara;"
 
 # copy file over to output dir
-cp /scratch/$user/$jobid/output/out.hipo $output_dir/$jobid.hipo
+cp /scratch/$user/$jobid/output/out_gemc.hipo $output_dir/$jobid.hipo
 
 # clean up
 ## add after testing
