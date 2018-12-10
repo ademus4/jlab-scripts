@@ -15,8 +15,7 @@ from string import Template
 ## input file(s), each input file will be a job
 ## output directory (on work), names must be unique
 ## number of events to process (optional)
-
-
+  
 def main(args):
     # load template file
     with open(args['template'], 'r') as f:
@@ -64,6 +63,9 @@ if __name__ == "__main__":
     parser.add_argument('-t', '--template',
                         help='Template file to use',
                         required=True)
+    parser.add_argument('-e', '--email',
+                        help='Email address for job messages',
+                        required=False)
     parser.add_argument('-n', '--events',
                         help='Number of events to read from the input file',
                         required=False,
