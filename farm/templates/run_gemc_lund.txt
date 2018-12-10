@@ -13,7 +13,7 @@ mkdir -p /scratch/$user/$jobid/output/
 cp $input_path/$input_file /scratch/$user/$jobid/input/
 
 # run main simulation
-docker run -it --rm \
+docker run -i --rm \
     -v /scratch/:/scratch/ \
     -w /scratch/$user/$jobid/output/ \
     maureeungaro/clas12simulations:iprod \
