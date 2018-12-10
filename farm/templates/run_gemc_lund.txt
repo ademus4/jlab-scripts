@@ -10,7 +10,7 @@ mkdir -p /scratch/$user/$jobid/input/
 mkdir -p /scratch/$user/$jobid/output/
 
 # copy over the input file
-cp $input_path/$input_file /scratch/$user/input/
+cp $input_path/$input_file /scratch/$user/$jobid/input/
 
 # run main simulation
 docker run -it --rm \
