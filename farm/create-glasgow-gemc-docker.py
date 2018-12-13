@@ -34,6 +34,7 @@ def main(args):
         extras = {
             "input_file": input_file,
             "input_path": input_path,
+            "output_name": input_file.split('.')[0],
             "user": user,
             "jobid": "{:05d}".format(i)
         }
