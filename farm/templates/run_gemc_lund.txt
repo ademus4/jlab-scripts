@@ -4,6 +4,7 @@
 #PBS -m abe
 #PBS -M $email
 #PBS -V
+#PBS -l walltime=24:00:00,file=20000000kb
 
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/input/
