@@ -4,7 +4,7 @@
 #PBS -m abe
 #PBS -M $email
 #PBS -V
-#PBS -l walltime=24:00:00,file=20gb,mem=20gb
+#PBS -l walltime=48:00:00,file=20gb
 
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/input/
@@ -12,13 +12,14 @@ mkdir -p /scratch/$user/$jobid/output/
 
 # copy over the input file
 cp $input_path/$input_file /scratch/$user/$jobid/input/
+cp $gcard /scratch/$user/$jobid/input/setup.gcard
 
 # run main simulation
 docker exec -i \
     -w /scratch/$user/$jobid/output/ \
     adamt_clas12sims \
     bash -c "source /etc/profile.d/environment.sh; \
-       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, gemc.ev' -gcard=$gcard; \
+       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, gemc.ev' -gcard=../input/setup.gcard; \
        evio2hipo -r $runid -t $torus -s $solenoid -i gemc.ev -o gemc.hipo; \
        createClaraCook.csh gemc.hipo $threads; \
        clara-shell cook.clara;"
