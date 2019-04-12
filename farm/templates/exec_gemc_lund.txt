@@ -17,7 +17,7 @@ cp $gcard /scratch/$user/$jobid/input/setup.gcard
 # run main simulation
 docker exec -i \
     -w /scratch/$user/$jobid/output/ \
-    adamt_clas12sims \
+    clas12sims \
     bash -c "source /etc/profile.d/environment.sh; \
        gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, gemc.ev' -gcard=../input/setup.gcard; \
        evio2hipo -r $runid -t $torus -s $solenoid -i gemc.ev -o gemc.hipo; \
