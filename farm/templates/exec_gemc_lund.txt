@@ -1,10 +1,10 @@
 #!/usr/bin/env bash
 
-#PBS -N gemc_lund_docker
+#PBS -N gemc_docker_$jobid
 #PBS -m abe
 #PBS -M $email
 #PBS -V
-#PBS -l walltime=48:00:00,file=20gb
+#PBS -l walltime=48:00:00,mem=4gb,ncpus=$threads
 
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/input/
@@ -17,6 +17,7 @@ cp $gcard /scratch/$user/$jobid/input/setup.gcard
 # run main simulation
 docker exec -i \
     -w /scratch/$user/$jobid/output/ \
+    -u $$(id -u):$$(id -g) \
     clas12sims \
     bash -c "source /etc/profile.d/environment.sh; \
        gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, ../input/$input_file' -OUTPUT='evio, gemc.ev' -gcard=../input/setup.gcard; \
@@ -31,4 +32,3 @@ cp /scratch/$user/$jobid/output/out_gemc.hipo $output_dir/$output_name.hipo
 
 # clean up
 ## add after testing
-
