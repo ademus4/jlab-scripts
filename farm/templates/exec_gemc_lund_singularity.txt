@@ -4,39 +4,35 @@
 #PBS -m abe
 #PBS -M $email
 #PBS -V
-#PBS -l walltime=48:00:00,mem=4gb,ncpus=$threads
+#PBS -l walltime=48:00:00,mem=4gb,ncpus=$clara_threads
 
 # create the base directories on scratch
-mkdir -p /scratch/$user/$jobid/input/
-mkdir -p /scratch/$user/$jobid/output/
+mkdir -p /scratch/$user/$jobid/
 
 # copy over the input file
-cp $input_path/$input_file /scratch/$user/$jobid/input/
-cp $gcard /scratch/$user/$jobid/input/setup.gcard
+cp $input_path/$input_file /scratch/$user/$jobid/
+cp $gcard /scratch/$user/$jobid/setup.gcard
 
 # run main simulation
 singularity exec \
-    --bind /scratch/$user/$jobid:/current \
+    --bind /scratch/$user/$jobid/:/current \
     --pwd /current \
     --bind /cvmfs \
     --contain \
     --ipc \
     --pid \
     /cvmfs/singularity.opensciencegrid.org/jeffersonlab/clas12simulations:production \
-    bash -c "source /etc/profile.d/environmentB.sh; \
+    bash -c "source /etc/profile.d/environment.sh; \
        echo 'Launching GEMC'; \
-       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, input/$input_file' -OUTPUT='evio, output/gemc.ev' -gcard=input/setup.gcard; \
+       gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, $input_file' -OUTPUT='evio, gemc.ev' setup.gcard; \
        echo 'Launching Decoder'; \
-       evio2hipo -r $runid -t $torus -s $solenoid -i output/gemc.ev -o output/gemc.hipo; \
+       evio2hipo -r $runid -t $torus -s $solenoid -i gemc.ev -o gemc.hipo; \
        echo 'Launching Reconstruction'; \
-       notsouseful-util -i output/gemc.hipo -o output/out_gemc.hipo -c 2;"
-
-# filter dsts here
+       createClaraCook.csh gemc.hipo $clara_config $clara_threads; \
+       clara-shell cook.clara;"
 
 # copy file over to output dir
-cp /scratch/$user/$jobid/output/out_gemc.hipo $output_dir/$output_name.hipo
+cp /scratch/$user/$jobid/out_gemc.hipo $output_dir/$output_name.hipo
 
 # clean up
-rm -rf /scratch/$user/$jobid/input/
-rm -rf /scratch/$user/$jobid/output/
-
+##rm -rf /scratch/$user/$jobid/
