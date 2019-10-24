@@ -4,7 +4,7 @@
 #PBS -m abe
 #PBS -M $email
 #PBS -V
-#PBS -l walltime=48:00:00,mem=4gb,ncpus=$clara_threads
+#PBS -l walltime=96:00:00,mem=4gb,ncpus=$clara_threads
 
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/
@@ -28,8 +28,8 @@ singularity exec \
        echo 'Launching Decoder'; \
        evio2hipo -r $runid -t $torus -s $solenoid -i gemc.ev -o gemc.hipo; \
        echo 'Launching Reconstruction'; \
-       createClaraCook.csh gemc.hipo $clara_config $clara_threads; \
-       clara-shell cook.clara;"
+       recon-util -y $clara_config -i gemc.hipo -o out_gemc.hipo;"
+
 
 # copy file over to output dir
 cp /scratch/$user/$jobid/out_gemc.hipo $output_dir/$output_name.hipo
