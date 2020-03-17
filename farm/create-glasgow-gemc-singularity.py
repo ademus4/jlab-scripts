@@ -3,6 +3,7 @@ import configparser
 import getpass
 import os
 from datetime import datetime
+from glob import glob
 from string import Template
 
   
@@ -12,7 +13,6 @@ def main(args):
     config.read(args['config'])
 
     # prepare the input files
-    input_files = args['input_files']  # can be a list
     jsub_filename = "gemc_singularity_{:05d}.qsub"
     user = getpass.getuser()
     
@@ -21,9 +21,12 @@ def main(args):
         with open(config[section]['template'], 'r') as f:
             src = Template(f.read())
 
+
+        input_files = glob(os.path.join(config[section]['input_dir'], '*.ld'))
         for i, item in enumerate(input_files):
             # set all the values for each input file
             output_filename = section + '_' + jsub_filename.format(i)
+            output_filename = os.path.join(config[section]['qsub_dir'], output_filename)
             input_path, input_file = os.path.split(item)
             data = config[section]
             extras = {
@@ -47,12 +50,6 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description=('A program to create GEMC Singularity based jsub '
                      'files for the Glasgow farm'))
-    parser.add_argument('-i', '--input_files',
-                        help='Full path to the input file(s)'
-                             '(use * wildcard for multiple files',
-                        required=True,
-                        action='store',
-                        nargs='+')  # needed for multiple inputs
     parser.add_argument('-c', '--config',
                         help='Path to the configuration file',
                         required=True)
