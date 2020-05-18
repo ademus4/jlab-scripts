@@ -6,12 +6,10 @@ An example of generating qsub files that use Singularity to run GEMC and the HIP
 ```
 #!/usr/bin/env bash
 python3 create-glasgow-gemc-singularity.py \
-    -i /my/lund/files/*.ld \
     -c ./configs.ini
 ```
 
-The input event files should be in LUND format. The config file contains the parameters used by GEMC, CLARA etc. The script will loop though
-all the configurations set inside the config file.
+The config file contains the parameters used by GEMC, CLARA etc. The script will loop though all the configurations set inside the config file. See the example config file to check the parameters to set.
 
 # Direct (subprocess)
 

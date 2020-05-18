@@ -14,6 +14,7 @@ cp $input_path/$input_file /scratch/$user/$jobid/
 cp $gcard /scratch/$user/$jobid/setup.gcard
 
 # run main simulation
+cvmfs_config probe  # check mount
 singularity exec \
     --bind /scratch/$user/$jobid/:/current \
     --pwd /current \
