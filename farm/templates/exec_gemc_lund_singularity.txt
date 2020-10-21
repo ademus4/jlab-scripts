@@ -4,7 +4,10 @@
 #PBS -m abe
 #PBS -M $email
 #PBS -V
-#PBS -l walltime=96:00:00,mem=4gb,ncpus=$clara_threads
+#PBS -l walltime=96:00:00,mem=$memory,ncpus=$clara_threads
+
+# make sure cvmfs is mounted
+cvmfs_config probe
 
 # create the base directories on scratch
 mkdir -p /scratch/$user/$jobid/
@@ -21,7 +24,7 @@ singularity exec \
     --contain \
     --ipc \
     --pid \
-    /cvmfs/singularity.opensciencegrid.org/jeffersonlab/clas12simulations:production \
+    /cvmfs/singularity.opensciencegrid.org/jeffersonlab/clas12software:production \
     bash -c "source /etc/profile.d/environment.sh; \
        echo 'Launching GEMC'; \
        gemc -USE_GUI=0 -N=$events -INPUT_GEN_FILE='lund, $input_file' -OUTPUT='evio, gemc.ev' setup.gcard; \
@@ -35,4 +38,4 @@ singularity exec \
 cp /scratch/$user/$jobid/out_gemc.hipo $output_dir/$output_name.hipo
 
 # clean up
-##rm -rf /scratch/$user/$jobid/
+rm -rf /scratch/$user/$jobid/
