@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+
+#PBS -N finalstate_$jobid
+#PBS -m abe
+#PBS -M $email
+#PBS -V
+#PBS -l walltime=24:00:00,mem=2gb,ncpus=1
+
+cd $$FINALSTATECODE
+time python process_runs.py -i $input_file -o $output_dir -c $config
+
